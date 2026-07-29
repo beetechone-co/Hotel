@@ -3,31 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Khách Sạn - Phân Quyền Bảo Mặt</title>
-    <!-- Thư viện Tailwind CSS & FontAwesome Icons -->
+    <title>Hệ Thống Quản Lý Khách Sạn (SaaS Multi-Tenant)</title>
+    <!-- Tailwind CSS & FontAwesome Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-    <!-- ================= 1. MÀN HÌNH SETUP BAN ĐẦU ================= -->
+    <!-- ================= 1. MÀN HÌNH SETUP NHÀ NGHỈ MỚI ================= -->
     <div id="setup-screen" class="fixed inset-0 bg-slate-900 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-indigo-600 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3 shadow-lg shadow-indigo-200">
-                    <i class="fa-solid fa-sliders"></i>
+                    <i class="fa-solid fa-plus-circle"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800">Cấu Hình Ban Đầu</h2>
-                <p class="text-xs text-slate-500 mt-1">Thiết lập thông tin hệ thống khách sạn của bạn</p>
+                <h2 class="text-xl font-bold text-slate-800">Đăng Ký Nhà Nghỉ Mới</h2>
+                <p class="text-xs text-slate-500 mt-1">Khởi tạo hệ thống cho cơ sở kinh doanh của bạn</p>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tên Nhà Nghỉ / Khách Sạn</label>
-                    <input id="setup-hotel-name" type="text" placeholder="Ví dụ: Khách Sạn Mây Hồng" class="w-full border rounded-xl p-2.5 text-sm focus:outline-indigo-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Mã Định Danh (Viết liền không dấu)</label>
+                    <input id="setup-hotel-id" type="text" placeholder="mayhong, khachsancatba..." class="w-full border rounded-xl p-2.5 text-sm focus:outline-indigo-500 font-mono">
+                    <p class="text-[11px] text-slate-400 mt-1">* Mã này sẽ xuất hiện trên đường dẫn Web (URL)</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Số điện thoại Chủ (Quản trị)</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tên Hiển Thị Khách Sạn / Nhà Nghỉ</label>
+                    <input id="setup-hotel-name" type="text" placeholder="Khách Sạn Mây Hồng" class="w-full border rounded-xl p-2.5 text-sm focus:outline-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Số điện thoại Chủ (Admin)</label>
                     <input id="setup-admin-phone" type="text" placeholder="0901234567" class="w-full border rounded-xl p-2.5 text-sm focus:outline-indigo-500">
                 </div>
                 <div>
@@ -35,8 +40,8 @@
                     <input id="setup-admin-pass" type="password" placeholder="••••••••" class="w-full border rounded-xl p-2.5 text-sm focus:outline-indigo-500">
                 </div>
 
-                <button onclick="handleSystemSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl text-sm transition shadow-md shadow-indigo-100">
-                    Hoàn Tất Cài Đặt Ban Đầu
+                <button onclick="handleCreateHotel()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl text-sm transition shadow-md shadow-indigo-100">
+                    Khởi Tạo Hệ Thống
                 </button>
             </div>
         </div>
@@ -85,7 +90,7 @@
         <header class="bg-indigo-600 text-white p-4 shadow-md flex justify-between items-center">
             <div>
                 <h1 id="app-hotel-name" class="text-xl font-bold"><i class="fa-solid fa-hotel mr-2"></i>Khách Sạn</h1>
-                <p class="text-xs text-indigo-200">Đồng bộ dữ liệu thời gian thực (Firebase Cloud)</p>
+                <p class="text-xs text-indigo-200">Multi-Tenant SaaS Engine (Firebase Cloud)</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="text-xs bg-indigo-700 px-3 py-2 rounded-xl flex items-center gap-2">
@@ -107,7 +112,6 @@
                 <button id="tab-revenue-btn" onclick="switchTab('revenue')" class="py-3 px-4 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-chart-line"></i> Báo Cáo Doanh Thu
                 </button>
-                <!-- Tab Quản lý nhân viên - MẶC ĐỊNH HẲN LÀ HIDDEN (Chỉ mở nếu là Admin) -->
                 <button id="tab-staff-btn" onclick="switchTab('staff')" class="hidden py-3 px-4 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-users-gear text-indigo-600"></i> Quản Lý Nhân Viên
                 </button>
@@ -193,10 +197,9 @@
                 </div>
             </div>
 
-            <!-- TAB 3: QUẢN LÝ NHÂN VIÊN (Chỉ dành riêng cho Chủ Admin) -->
+            <!-- TAB 3: QUẢN LÝ NHÂN VIÊN -->
             <div id="tab-staff-content" class="hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Form thêm nhân viên mới -->
                     <div class="bg-white rounded-2xl p-5 border shadow-sm h-fit">
                         <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-user-plus text-indigo-600"></i> Thêm Nhân Viên / Lễ Tân
@@ -220,21 +223,18 @@
                         </div>
                     </div>
 
-                    <!-- Danh sách nhân viên hiện tại -->
                     <div class="lg:col-span-2 bg-white rounded-2xl p-5 border shadow-sm">
                         <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-users text-indigo-600"></i> Danh Sách Tài Khoản Nhân Viên
                         </h3>
-                        <div id="staff-list-container" class="space-y-3">
-                            <!-- JS Render vào đây -->
-                        </div>
+                        <div id="staff-list-container" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL THAO TÁC PHÒNG -->
+    <!-- MODALS -->
     <div id="modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center pb-3 border-b mb-4">
@@ -245,7 +245,6 @@
         </div>
     </div>
 
-    <!-- MODAL QUẢN LÝ DANH MỤC NƯỚC -->
     <div id="menu-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center pb-3 border-b mb-4">
@@ -266,7 +265,6 @@
         </div>
     </div>
 
-    <!-- MODAL THÊM / SỬA PHÒNG -->
     <div id="add-room-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center pb-3 border-b mb-4">
@@ -304,7 +302,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CHÍNH LOGIC & FIREBASE -->
+    <!-- FIREBASE & CORE ENGINE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, getDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -321,62 +319,88 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const roomsRef = collection(db, "rooms");
-        const ordersRef = collection(db, "orders");
-        const menuRef = collection(db, "menu");
-        const usersRef = collection(db, "users");
 
-        let roomsData = [];
-        let ordersData = [];
-        let menuData = [];
-        let usersData = [];
-        let systemConfig = null;
-        let currentUser = null;
+        // ĐỌC HOTEL_ID TỪ URL PARAMETER (?hotel=xxx)
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentHotelId = urlParams.get('hotel')?.toLowerCase().trim();
 
-        // KIỂM TRA SETUP BAN ĐẦU
-        async function checkSystemSetup() {
-            const configDoc = await getDoc(doc(db, "system", "config"));
-            if (!configDoc.exists()) {
+        let roomsRef, ordersRef, menuRef, usersRef;
+        let roomsData = [], ordersData = [], menuData = [], usersData = [];
+        let systemConfig = null, currentUser = null;
+
+        async function initApplication() {
+            if (!currentHotelId) {
+                // Nếu URL chưa có ?hotel= -> Hiện màn hình đăng ký nhà nghỉ mới
                 document.getElementById("setup-screen").classList.remove("hidden");
-            } else {
-                systemConfig = configDoc.data();
-                document.getElementById("login-hotel-title").innerText = systemConfig.hotelName;
-                document.getElementById("login-screen").classList.remove("hidden");
-                checkAutoLogin();
+                return;
             }
-        }
-        checkSystemSetup();
 
-        window.handleSystemSetup = async function() {
+            // Tạo các đường dẫn Collection động tách biệt theo currentHotelId
+            const hotelDocRef = doc(db, "hotels", currentHotelId);
+            roomsRef = collection(db, `hotels/${currentHotelId}/rooms`);
+            ordersRef = collection(db, `hotels/${currentHotelId}/orders`);
+            menuRef = collection(db, `hotels/${currentHotelId}/menu`);
+            usersRef = collection(db, `hotels/${currentHotelId}/users`);
+
+            const hotelSnap = await getDoc(hotelDocRef);
+            if (!hotelSnap.exists()) {
+                alert(`Không tìm thấy dữ liệu nhà nghỉ có mã: "${currentHotelId}". Vui lòng tạo mới!`);
+                document.getElementById("setup-screen").classList.remove("hidden");
+                document.getElementById("setup-hotel-id").value = currentHotelId;
+                return;
+            }
+
+            systemConfig = hotelSnap.data();
+            document.getElementById("login-hotel-title").innerText = systemConfig.hotelName;
+            document.getElementById("login-screen").classList.remove("hidden");
+            checkAutoLogin();
+        }
+
+        initApplication();
+
+        // TẠO NHÀ NGHỈ MỚI
+        window.handleCreateHotel = async function() {
+            const hotelId = document.getElementById("setup-hotel-id").value.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
             const hotelName = document.getElementById("setup-hotel-name").value.trim();
             const adminPhone = document.getElementById("setup-admin-phone").value.trim();
             const adminPass = document.getElementById("setup-admin-pass").value.trim();
 
-            if (!hotelName || !adminPhone || !adminPass) {
-                alert("Vui lòng nhập đầy đủ thông tin cấu hình ban đầu!");
+            if (!hotelId || !hotelName || !adminPhone || !adminPass) {
+                alert("Vui lòng điền đầy đủ tất cả thông tin!");
                 return;
             }
 
-            await setDoc(doc(db, "system", "config"), { hotelName: hotelName });
-            await setDoc(doc(db, "users", adminPhone), {
+            const hotelDocRef = doc(db, "hotels", hotelId);
+            const checkExist = await getDoc(hotelDocRef);
+            if (checkExist.exists()) {
+                alert("Mã nhà nghỉ này đã tồn tại, vui lòng chọn mã khác!");
+                return;
+            }
+
+            // Lưu thông tin nhà nghỉ
+            await setDoc(hotelDocRef, { hotelId: hotelId, hotelName: hotelName, createdAt: new Date().toISOString() });
+            
+            // Lưu tài khoản Chủ
+            await setDoc(doc(db, `hotels/${hotelId}/users`, adminPhone), {
                 phone: adminPhone,
                 password: adminPass,
                 name: "Chủ Khách Sạn",
                 role: "admin"
             });
 
-            location.reload();
+            // Chuyển hướng đến URL mới
+            window.location.href = `?hotel=${hotelId}`;
         }
 
         function checkAutoLogin() {
-            const savedPhone = localStorage.getItem("hotel_logged_phone");
+            const savedPhone = localStorage.getItem(`hotel_${currentHotelId}_phone`);
             if (savedPhone) {
-                getDoc(doc(db, "users", savedPhone)).then(userSnap => {
+                getDoc(doc(db, `hotels/${currentHotelId}/users`, savedPhone)).then(userSnap => {
                     if (userSnap.exists()) {
                         currentUser = userSnap.data();
                         showMainApp();
                     } else {
-                        localStorage.removeItem("hotel_logged_phone");
+                        localStorage.removeItem(`hotel_${currentHotelId}_phone`);
                     }
                 });
             }
@@ -388,13 +412,13 @@
             const errorBox = document.getElementById("login-error");
 
             if (!phone || !password) {
-                errorBox.innerText = "Vui lòng nhập Số điện thoại và Mật khẩu!";
+                errorBox.innerText = "Vui lòng nhập SĐT và Mật khẩu!";
                 errorBox.classList.remove("hidden");
                 return;
             }
 
             try {
-                const userSnap = await getDoc(doc(db, "users", phone));
+                const userSnap = await getDoc(doc(db, `hotels/${currentHotelId}/users`, phone));
                 if (!userSnap.exists() || userSnap.data().password !== password) {
                     errorBox.innerText = "SĐT hoặc Mật khẩu không chính xác!";
                     errorBox.classList.remove("hidden");
@@ -402,7 +426,7 @@
                 }
 
                 currentUser = userSnap.data();
-                localStorage.setItem("hotel_logged_phone", phone);
+                localStorage.setItem(`hotel_${currentHotelId}_phone`, phone);
                 showMainApp();
 
             } catch (error) {
@@ -413,7 +437,7 @@
         }
 
         window.handleLogout = function() {
-            localStorage.removeItem("hotel_logged_phone");
+            localStorage.removeItem(`hotel_${currentHotelId}_phone`);
             location.reload();
         }
 
@@ -425,7 +449,6 @@
             const isOwner = currentUser.role === "admin";
             document.getElementById("current-user-info").innerHTML = `${currentUser.name} (${currentUser.phone}) ${isOwner ? '<span class="bg-amber-400 text-slate-900 font-bold text-[10px] px-2 py-0.5 rounded-md ml-1">CHỦ</span>' : '<span class="bg-indigo-400 text-white font-bold text-[10px] px-2 py-0.5 rounded-md ml-1">LỄ TÂN</span>'}`;
 
-            // KIỂM TRA QUYỀN BẢO MẬT: CHỈ CÓ ADMIN MỚI ĐƯỢC HIỂN THỊ TAB QUẢN LÝ NHÂN VIÊN
             const btnStaff = document.getElementById("tab-staff-btn");
             if (isOwner) {
                 btnStaff.classList.remove("hidden");
@@ -441,7 +464,6 @@
         }
 
         window.switchTab = function(tabName) {
-            // Chặn lễ tân cố tình chuyển sang tab staff
             if (tabName === "staff" && currentUser.role !== "admin") {
                 alert("Tài khoản Lễ tân không có quyền truy cập khu vực này!");
                 tabName = "rooms";
@@ -475,7 +497,6 @@
             }
         }
 
-        // Realtime Lắng nghe người dùng (Chỉ Chủ mới chạy hàm này)
         function startListenUsers() {
             onSnapshot(usersRef, (snapshot) => {
                 usersData = [];
@@ -504,44 +525,30 @@
             });
         }
 
-        // BẢO MẬT HÀM THÊM NHÂN VIÊN
         window.submitAddStaff = async function() {
-            if (currentUser.role !== "admin") {
-                alert("Chỉ có tài khoản Chủ mới được phép thêm nhân viên!");
-                return;
-            }
-
+            if (currentUser.role !== "admin") return;
             const name = document.getElementById("staff-name-input").value.trim();
             const phone = document.getElementById("staff-phone-input").value.trim();
             const pass = document.getElementById("staff-pass-input").value.trim();
 
             if (!name || !phone || !pass) {
-                alert("Vui lòng nhập đủ Tên, SĐT và Mật khẩu!");
+                alert("Vui lòng nhập đủ thông tin!");
                 return;
             }
 
-            await setDoc(doc(db, "users", phone), {
-                phone: phone,
-                password: pass,
-                name: name,
-                role: "staff" // Luôn ấn định vai trò Lễ tân
+            await setDoc(doc(db, `hotels/${currentHotelId}/users`, phone), {
+                phone: phone, password: pass, name: name, role: "staff"
             });
 
             document.getElementById("staff-name-input").value = "";
             document.getElementById("staff-phone-input").value = "";
             document.getElementById("staff-pass-input").value = "";
-            alert(`Đã thêm thành công tài khoản Lễ tân: ${name}`);
         }
 
-        // BẢO MẬT HÀM XÓA NHÂN VIÊN
         window.deleteStaff = async function(phone) {
-            if (currentUser.role !== "admin") {
-                alert("Chỉ có tài khoản Chủ mới được phép xóa nhân viên!");
-                return;
-            }
-
-            if (confirm(`Bạn có chắc chắn muốn xóa nhân viên SĐT ${phone}?`)) {
-                await deleteDoc(doc(db, "users", phone));
+            if (currentUser.role !== "admin") return;
+            if (confirm(`Bạn có chắc muốn xóa nhân viên SĐT ${phone}?`)) {
+                await deleteDoc(doc(db, `hotels/${currentHotelId}/users`, phone));
             }
         }
 
@@ -554,11 +561,10 @@
                         { id: "biatiger", name: "Bia Tiger Lon", price: 25000 }
                     ];
                     for (let item of defaultMenu) {
-                        await setDoc(doc(db, "menu", item.id), item);
+                        await setDoc(doc(db, `hotels/${currentHotelId}/menu`, item.id), item);
                     }
                     return;
                 }
-
                 menuData = [];
                 snapshot.forEach(doc => menuData.push(doc.data()));
                 renderMenuItems();
@@ -587,19 +593,15 @@
                     const initialRooms = [
                         { id: "101", name: "P.101 (Đơn)", status: "available", priceFirstHour: 60000, priceNextHour: 40000, pricePerNight: 200000, checkInTimeISO: "", customer: "", rentalType: "hour", drinks: [] },
                         { id: "102", name: "P.102 (Đơn)", status: "available", priceFirstHour: 60000, priceNextHour: 40000, pricePerNight: 200000, checkInTimeISO: "", customer: "", rentalType: "hour", drinks: [] },
-                        { id: "103", name: "P.103 (Đôi)", status: "available", priceFirstHour: 80000, priceNextHour: 50000, pricePerNight: 300000, checkInTimeISO: "", customer: "", rentalType: "hour", drinks: [] },
                     ];
                     for (let room of initialRooms) {
-                        await setDoc(doc(db, "rooms", room.id), room);
+                        await setDoc(doc(db, `hotels/${currentHotelId}/rooms`, room.id), room);
                     }
                     return;
                 }
 
                 roomsData = [];
-                snapshot.forEach((doc) => {
-                    roomsData.push(doc.data());
-                });
-
+                snapshot.forEach((doc) => roomsData.push(doc.data()));
                 roomsData.sort((a, b) => a.id.localeCompare(b.id, undefined, {numeric: true}));
                 renderRooms();
             });
@@ -608,10 +610,7 @@
         function startListenOrders() {
             onSnapshot(ordersRef, (snapshot) => {
                 ordersData = [];
-                snapshot.forEach((doc) => {
-                    ordersData.push(doc.data());
-                });
-
+                snapshot.forEach((doc) => ordersData.push(doc.data()));
                 ordersData.sort((a, b) => new Date(b.checkOutTimeISO) - new Date(a.checkOutTimeISO));
                 renderRevenueAndHistory();
             });
@@ -627,20 +626,11 @@
                 let statusColor = "", statusText = "", statusBg = "";
 
                 if (room.status === "available") {
-                    statusColor = "border-emerald-500 text-emerald-700";
-                    statusBg = "bg-emerald-50/50 hover:bg-emerald-100/50";
-                    statusText = "Phòng Trống";
-                    availableCount++;
+                    statusColor = "border-emerald-500 text-emerald-700"; statusBg = "bg-emerald-50/50 hover:bg-emerald-100/50"; statusText = "Phòng Trống"; availableCount++;
                 } else if (room.status === "occupied") {
-                    statusColor = "border-rose-500 text-rose-700";
-                    statusBg = "bg-rose-50/50 hover:bg-rose-100/50";
-                    statusText = "Đang Có Khách";
-                    occupiedCount++;
+                    statusColor = "border-rose-500 text-rose-700"; statusBg = "bg-rose-50/50 hover:bg-rose-100/50"; statusText = "Đang Có Khách"; occupiedCount++;
                 } else {
-                    statusColor = "border-amber-500 text-amber-700";
-                    statusBg = "bg-amber-50/50 hover:bg-amber-100/50";
-                    statusText = "Chờ Dọn Dẹp";
-                    cleaningCount++;
+                    statusColor = "border-amber-500 text-amber-700"; statusBg = "bg-amber-50/50 hover:bg-amber-100/50"; statusText = "Chờ Dọn Dẹp"; cleaningCount++;
                 }
 
                 let formattedTime = "";
@@ -757,15 +747,13 @@
                 drinkPrice = room.drinks.reduce((sum, d) => sum + (d.price * d.quantity), 0);
             }
 
-            const totalPrice = roomPrice + drinkPrice;
-
             return {
                 checkInStr: checkIn.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) + " - " + checkIn.toLocaleDateString('vi-VN'),
                 checkOutStr: checkOut.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) + " - " + checkOut.toLocaleDateString('vi-VN'),
                 durationStr: `${hours} giờ ${minutes} phút`,
                 roomPrice: roomPrice,
                 drinkPrice: drinkPrice,
-                totalPrice: totalPrice,
+                totalPrice: roomPrice + drinkPrice,
                 checkOutISO: checkOut.toISOString()
             };
         }
@@ -810,93 +798,56 @@
                 `;
             } else if (room.status === "occupied") {
                 const bill = calculateBill(room);
-
-                let drinksHTML = "";
-                if (room.drinks && room.drinks.length > 0) {
-                    drinksHTML = room.drinks.map(d => `
-                        <div class="flex justify-between items-center text-xs text-slate-600 py-1 border-b border-indigo-100">
-                            <span>${d.name} (x${d.quantity})</span>
-                            <span class="font-semibold">${(d.price * d.quantity).toLocaleString()}đ</span>
-                        </div>
-                    `).join("");
-                } else {
-                    drinksHTML = `<p class="text-[11px] text-slate-400 italic">Chưa gọi nước uống nào.</p>`;
-                }
+                let drinksHTML = (room.drinks && room.drinks.length > 0) 
+                    ? room.drinks.map(d => `<div class="flex justify-between items-center text-xs text-slate-600 py-1 border-b border-indigo-100"><span>${d.name} (x${d.quantity})</span><span class="font-semibold">${(d.price * d.quantity).toLocaleString()}đ</span></div>`).join("")
+                    : `<p class="text-[11px] text-slate-400 italic">Chưa gọi nước uống nào.</p>`;
 
                 let menuSelectHTML = menuData.map(m => `<option value="${m.id}">${m.name} (${Number(m.price).toLocaleString()}đ)</option>`).join("");
 
                 modalBody.innerHTML = `
                     <div class="bg-indigo-50 border border-indigo-100 p-3.5 rounded-xl mb-4 space-y-2 text-xs">
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Khách hàng:</span>
-                            <span class="font-semibold text-slate-800">${room.customer}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Giờ vào:</span>
-                            <span>${bill.checkInStr} (${bill.durationStr})</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-slate-500">Khách hàng:</span><span class="font-semibold text-slate-800">${room.customer}</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Giờ vào:</span><span>${bill.checkInStr} (${bill.durationStr})</span></div>
                         <div class="flex justify-between text-indigo-700 font-semibold border-t border-indigo-100 pt-1.5">
-                            <span>Tiền phòng (${room.rentalType === 'night' ? 'Qua đêm' : 'Theo giờ'}):</span>
-                            <span>${bill.roomPrice.toLocaleString()} VNĐ</span>
+                            <span>Tiền phòng (${room.rentalType === 'night' ? 'Qua đêm' : 'Theo giờ'}):</span><span>${bill.roomPrice.toLocaleString()} VNĐ</span>
                         </div>
-
                         <div class="mt-2 bg-white/80 p-2 rounded-lg border border-indigo-100">
-                            <p class="font-bold text-[11px] text-slate-700 mb-1 flex justify-between">
-                                <span>🥤 Nước / Dịch vụ đã dùng:</span>
-                                <span class="text-amber-600">${bill.drinkPrice.toLocaleString()}đ</span>
-                            </p>
+                            <p class="font-bold text-[11px] text-slate-700 mb-1 flex justify-between"><span>🥤 Nước / Dịch vụ:</span><span class="text-amber-600">${bill.drinkPrice.toLocaleString()}đ</span></p>
                             ${drinksHTML}
                         </div>
-
                         <div class="border-t border-indigo-200 pt-2 flex justify-between items-center text-sm">
-                            <span class="font-bold text-slate-700">TỔNG THANH TOÁN:</span>
-                            <span class="font-black text-rose-600 text-base">${bill.totalPrice.toLocaleString()} VNĐ</span>
+                            <span class="font-bold text-slate-700">TỔNG THANH TOÁN:</span><span class="font-black text-rose-600 text-base">${bill.totalPrice.toLocaleString()} VNĐ</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-50 p-3 rounded-xl border mb-4">
                         <p class="text-xs font-bold text-slate-700 mb-2"><i class="fa-solid fa-plus-circle text-amber-500 mr-1"></i> Gọi Thêm Nước Uống:</p>
                         <div class="flex gap-2">
-                            <select id="select-drink-id" class="w-2/3 border rounded-lg p-1.5 text-xs focus:outline-indigo-500">
-                                ${menuSelectHTML}
-                            </select>
+                            <select id="select-drink-id" class="w-2/3 border rounded-lg p-1.5 text-xs focus:outline-indigo-500">${menuSelectHTML}</select>
                             <input id="input-drink-qty" type="number" value="1" min="1" class="w-1/3 border rounded-lg p-1.5 text-xs text-center focus:outline-indigo-500">
                         </div>
-                        <button onclick="addDrinkToRoom('${room.id}')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-1.5 rounded-lg text-xs transition mt-2">
-                            + Thêm Nước Vào Phòng
-                        </button>
+                        <button onclick="addDrinkToRoom('${room.id}')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-1.5 rounded-lg text-xs transition mt-2">+ Thêm Nước Vào Phòng</button>
                     </div>
 
-                    <button onclick="checkOut('${room.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-md shadow-rose-100">
-                        <i class="fa-solid fa-check-circle mr-1"></i> Trả Phòng & Nhận Thanh Toán
-                    </button>
+                    <button onclick="checkOut('${room.id}')" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-md shadow-rose-100"><i class="fa-solid fa-check-circle mr-1"></i> Trả Phòng & Nhận Thanh Toán</button>
                 `;
             } else {
                 modalBody.innerHTML = `
                     <p class="text-sm text-slate-600 mb-4">Xác nhận phòng đã dọn dẹp xong để chuẩn bị đón khách mới?</p>
-                    <button onclick="finishCleaning('${room.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-lg text-sm transition">
-                        Xác Nhận Đã Dọn Xong
-                    </button>
+                    <button onclick="finishCleaning('${room.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-lg text-sm transition">Xác Nhận Đã Dọn Xong</button>
                 `;
             }
 
             modal.classList.remove("hidden");
         }
 
-        window.closeModal = function() {
-            document.getElementById("modal").classList.add("hidden");
-        }
+        window.closeModal = function() { document.getElementById("modal").classList.add("hidden"); }
 
         window.checkIn = async function(roomId) {
             const customerName = document.getElementById("input-customer").value || "Khách lẻ";
             const rentalType = document.getElementById("input-rental-type").value;
-            
-            await updateDoc(doc(db, "rooms", roomId), {
-                status: "occupied",
-                customer: customerName,
-                rentalType: rentalType,
-                checkInTimeISO: new Date().toISOString(),
-                drinks: []
+            await updateDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), {
+                status: "occupied", customer: customerName, rentalType: rentalType, checkInTimeISO: new Date().toISOString(), drinks: []
             });
             closeModal();
         }
@@ -904,26 +855,16 @@
         window.addDrinkToRoom = async function(roomId) {
             const drinkId = document.getElementById("select-drink-id").value;
             const qty = parseInt(document.getElementById("input-drink-qty").value) || 1;
-
             const drinkItem = menuData.find(m => m.id === drinkId);
             if (!drinkItem) return;
 
             const room = roomsData.find(r => r.id === roomId);
             let currentDrinks = room.drinks || [];
-
             const existingIndex = currentDrinks.findIndex(d => d.id === drinkId);
-            if (existingIndex > -1) {
-                currentDrinks[existingIndex].quantity += qty;
-            } else {
-                currentDrinks.push({
-                    id: drinkItem.id,
-                    name: drinkItem.name,
-                    price: Number(drinkItem.price),
-                    quantity: qty
-                });
-            }
+            if (existingIndex > -1) { currentDrinks[existingIndex].quantity += qty; }
+            else { currentDrinks.push({ id: drinkItem.id, name: drinkItem.name, price: Number(drinkItem.price), quantity: qty }); }
 
-            await updateDoc(doc(db, "rooms", roomId), { drinks: currentDrinks });
+            await updateDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), { drinks: currentDrinks });
             openModal(roomId);
         }
 
@@ -932,56 +873,33 @@
             const bill = calculateBill(room);
 
             await addDoc(ordersRef, {
-                roomId: room.id,
-                roomName: room.name,
-                customer: room.customer,
-                rentalType: room.rentalType,
-                durationStr: bill.durationStr,
-                checkInTimeISO: room.checkInTimeISO,
-                checkOutTimeISO: bill.checkOutISO,
-                roomPrice: bill.roomPrice,
-                drinkPrice: bill.drinkPrice,
-                totalPrice: bill.totalPrice,
-                staffName: currentUser.name,
-                staffPhone: currentUser.phone,
-                createdAt: new Date().toISOString()
+                roomId: room.id, roomName: room.name, customer: room.customer, rentalType: room.rentalType,
+                durationStr: bill.durationStr, checkInTimeISO: room.checkInTimeISO, checkOutTimeISO: bill.checkOutISO,
+                roomPrice: bill.roomPrice, drinkPrice: bill.drinkPrice, totalPrice: bill.totalPrice,
+                staffName: currentUser.name, staffPhone: currentUser.phone, createdAt: new Date().toISOString()
             });
 
-            await updateDoc(doc(db, "rooms", roomId), {
-                status: "cleaning",
-                customer: "",
-                checkInTimeISO: "",
-                rentalType: "hour",
-                drinks: []
+            await updateDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), {
+                status: "cleaning", customer: "", checkInTimeISO: "", rentalType: "hour", drinks: []
             });
-
             closeModal();
         }
 
         window.finishCleaning = async function(roomId) {
-            await updateDoc(doc(db, "rooms", roomId), { status: "available" });
+            await updateDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), { status: "available" });
             closeModal();
         }
 
-        window.openMenuModal = function() {
-            document.getElementById("menu-modal").classList.remove("hidden");
-        }
-        window.closeMenuModal = function() {
-            document.getElementById("menu-modal").classList.add("hidden");
-        }
+        window.openMenuModal = function() { document.getElementById("menu-modal").classList.remove("hidden"); }
+        window.closeMenuModal = function() { document.getElementById("menu-modal").classList.add("hidden"); }
 
         window.submitNewMenuItem = async function() {
             const name = document.getElementById("new-item-name").value.trim();
             const price = document.getElementById("new-item-price").value;
-
-            if (!name || !price) {
-                alert("Vui lòng nhập đầy đủ Tên nước và Giá tiền!");
-                return;
-            }
+            if (!name || !price) return;
 
             const id = "item_" + Date.now();
-            await setDoc(doc(db, "menu", id), { id: id, name: name, price: Number(price) });
-
+            await setDoc(doc(db, `hotels/${currentHotelId}/menu`, id), { id: id, name: name, price: Number(price) });
             document.getElementById("new-item-name").value = "";
             document.getElementById("new-item-price").value = "";
         }
@@ -1001,7 +919,6 @@
         window.openEditRoomModal = function(roomId) {
             closeModal();
             const room = roomsData.find(r => r.id === roomId);
-
             document.getElementById("add-room-title").innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-600 mr-2"></i>Chỉnh Sửa ${room.name}`;
             document.getElementById("edit-room-id-hidden").value = room.id;
             document.getElementById("new-room-id").value = room.id;
@@ -1010,13 +927,10 @@
             document.getElementById("new-room-price-first-hour").value = room.priceFirstHour || room.pricePerHour || "";
             document.getElementById("new-room-price-next-hour").value = room.priceNextHour || room.pricePerHour || "";
             document.getElementById("new-room-price-night").value = room.pricePerNight || "";
-
             document.getElementById("add-room-modal").classList.remove("hidden");
         }
 
-        window.closeAddRoomModal = function() {
-            document.getElementById("add-room-modal").classList.add("hidden");
-        }
+        window.closeAddRoomModal = function() { document.getElementById("add-room-modal").classList.add("hidden"); }
 
         window.submitNewRoom = async function() {
             const isEdit = document.getElementById("edit-room-id-hidden").value;
@@ -1026,44 +940,25 @@
             const priceNextHour = document.getElementById("new-room-price-next-hour").value;
             const priceNight = document.getElementById("new-room-price-night").value;
 
-            if (!roomId || !roomName || !priceFirstHour || !priceNextHour || !priceNight) {
-                alert("Vui lòng điền đầy đủ thông tin phòng!");
-                return;
-            }
+            if (!roomId || !roomName || !priceFirstHour || !priceNextHour || !priceNight) return;
 
             if (isEdit) {
-                await updateDoc(doc(db, "rooms", roomId), {
-                    name: roomName,
-                    priceFirstHour: Number(priceFirstHour),
-                    priceNextHour: Number(priceNextHour),
-                    pricePerNight: Number(priceNight)
+                await updateDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), {
+                    name: roomName, priceFirstHour: Number(priceFirstHour), priceNextHour: Number(priceNextHour), pricePerNight: Number(priceNight)
                 });
             } else {
-                await setDoc(doc(db, "rooms", roomId), {
-                    id: roomId,
-                    name: roomName,
-                    status: "available",
-                    priceFirstHour: Number(priceFirstHour),
-                    priceNextHour: Number(priceNextHour),
-                    pricePerNight: Number(priceNight),
-                    customer: "",
-                    checkInTimeISO: "",
-                    rentalType: "hour",
-                    drinks: []
+                await setDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId), {
+                    id: roomId, name: roomName, status: "available", priceFirstHour: Number(priceFirstHour),
+                    priceNextHour: Number(priceNextHour), pricePerNight: Number(priceNight), customer: "", checkInTimeISO: "", rentalType: "hour", drinks: []
                 });
             }
-
             closeAddRoomModal();
         }
 
         window.deleteRoom = async function(roomId) {
-            if (currentUser.role !== "admin") {
-                alert("Chỉ có tài khoản Chủ mới có quyền xóa phòng!");
-                return;
-            }
-
-            if (confirm(`Bạn có chắc chắn muốn XÓA phòng ${roomId} khỏi hệ thống không?`)) {
-                await deleteDoc(doc(db, "rooms", roomId));
+            if (currentUser.role !== "admin") return;
+            if (confirm(`Bạn có chắc muốn xóa phòng ${roomId}?`)) {
+                await deleteDoc(doc(db, `hotels/${currentHotelId}/rooms`, roomId));
                 closeModal();
             }
         }
